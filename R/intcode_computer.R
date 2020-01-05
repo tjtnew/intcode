@@ -1,5 +1,5 @@
 #' @export
-generic_intcode_computer <- function(state) {
+intcode <- function(state) {
     code <- digits(state$input[state$index], 10^(4:0))
     opcode <- as.integer(paste0(code[4],code[5]))
     parcodes <- code[3:1]
@@ -46,20 +46,5 @@ generic_intcode_computer <- function(state) {
         state$finished = TRUE
     }
 
-    state
-}
-
-#' @export
-single_intcode_computer <- function(state) {
-    finished = FALSE
-    output <- NULL
-    while(!finished) {
-        state <- generic_intcode_computer(state)
-        finished <- state$finished
-        if(!finished) {
-            output <- c(output, state$output)
-        }
-    }
-    state$all_output <- output
     state
 }

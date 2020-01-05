@@ -5,19 +5,21 @@ get_value <- function(input, parcodes, parameters, n, relative_base) {
         while((parameters[n] + 1) > length(input)) {
             input <- c(input, rep(0, length(input)))
         }
-        input[parameters[n] + 1]
+        value <- input[parameters[n] + 1]
     } else if (parcodes[n] == 1) {
-        parameters[n]
+        value <- parameters[n]
     } else if (parcodes[n] == 2) {
         # double memory if needed
         while((parameters[n] + 1 + relative_base) > length(input)) {
             input <- c(input, rep(0, length(input)))
         }
-        input[parameters[n] + 1 + relative_base]
+        value <- input[parameters[n] + 1 + relative_base]
     }
     else {
         stop("unknown parameter code")
     }
+    return(list(input = input,
+                value = value))
 }
 
 # Function to write a value for use by opcode function
@@ -57,7 +59,11 @@ opcode_1 <- function(state, parcodes) {
 
     parameters <- input[index + 1:3]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     y <- get_value(input, parcodes, parameters, 2, relative_base)
+    input <- y$input
+    y <- y$value
     input <- write_value(input, parcodes, parameters, 3, relative_base, x + y)
     index <- index + 4
 
@@ -71,7 +77,11 @@ opcode_2 <- function(state, parcodes) {
 
     parameters <- input[index + 1:3]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     y <- get_value(input, parcodes, parameters, 2, relative_base)
+    input <- y$input
+    y <- y$value
     input <- write_value(input, parcodes, parameters, 3, relative_base, x * y)
     index <- index + 4
 
@@ -100,6 +110,8 @@ opcode_4 <- function(state, parcodes) {
 
     parameter <- input[index + 1]
     x <- get_value(input, parcodes, parameter, 1, relative_base)
+    input <- x$input
+    x <- x$value
     index <- index + 2
 
     state$global_output <- x
@@ -113,8 +125,12 @@ opcode_5 <- function(state, parcodes) {
 
     parameters <- input[index + 1:2]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     if (x != 0) {
         y <- get_value(input, parcodes, parameters, 2, relative_base)
+        input <- y$input
+        y <- y$value
         index <- y + 1
     } else {
         index <- index + 3
@@ -130,8 +146,12 @@ opcode_6 <- function(state, parcodes) {
 
     parameters <- input[index + 1:2]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     if (x == 0) {
         y <- get_value(input, parcodes, parameters, 2, relative_base)
+        input <- y$input
+        y <- y$value
         index <- y + 1
     } else {
         index <- index + 3
@@ -147,7 +167,11 @@ opcode_7 <- function(state, parcodes) {
 
     parameters <- input[index + 1:3]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     y <- get_value(input, parcodes, parameters, 2, relative_base)
+    input <- y$input
+    y <- y$value
     if (x < y)  {
         input <- write_value(input, parcodes, parameters, 3, relative_base, 1)
     } else {
@@ -165,7 +189,11 @@ opcode_8 <- function(state, parcodes) {
 
     parameters <- input[index + 1:3]
     x <- get_value(input, parcodes, parameters, 1, relative_base)
+    input <- x$input
+    x <- x$value
     y <- get_value(input, parcodes, parameters, 2, relative_base)
+    input <- y$input
+    y <- y$value
     if (x == y)  {
         input <- write_value(input, parcodes, parameters, 3, relative_base, 1)
     } else {
@@ -183,6 +211,8 @@ opcode_9 <- function(state, parcodes) {
 
     parameter <- input[index + 1]
     x <- get_value(input, parcodes, parameter, 1, relative_base)
+    input <- x$input
+    x <- x$value
     relative_base <- relative_base + x
     index <- index + 2
 
